@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-
+import { useNavigate } from 'react-router-dom';
 function MyProfile() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const navigate = useNavigate();
     const token = localStorage.getItem("jwt_token");
 
     if (!token) {
