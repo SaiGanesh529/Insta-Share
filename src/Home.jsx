@@ -6,6 +6,13 @@ import Posts from './Posts';
 
 function Home() {
 
+  const token = localStorage.getItem("jwt_token");
+
+    if (!token) {
+      navigate("/login");   
+      return;
+    }
+
   const fetchStories = async () => {
     try {
       const res = await fetch("/api/insta-share/stories", {
