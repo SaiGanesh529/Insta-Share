@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { CiHeart } from "react-icons/ci";
 import { BsFillChatFill, BsFillShareFill } from "react-icons/bs";
+import { useLocation } from "react-router-dom";
 
 function SearchedPost() {
   const [posts, setPosts] = useState([]);
