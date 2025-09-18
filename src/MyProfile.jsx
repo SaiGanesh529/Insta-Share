@@ -5,6 +5,13 @@ function MyProfile() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const token = localStorage.getItem("jwt_token");
+
+    if (!token) {
+      navigate("/login");   // 👈 redirect if no token
+      return;
+    }
+    
     const fetchProfile = async () => {
       try {
         setLoading(true);
