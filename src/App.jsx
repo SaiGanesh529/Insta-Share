@@ -23,7 +23,6 @@ function App() {
         <Route path="/home" element={<Home />} />       {/* default route */}
         <Route path="/myprofile" element={<MyProfile />} /> {/* contact route */}
         <Route path="/IndividualProfiles/:userId" element={<IndividualProfiles />} /> {/* contact route */}
-        <Route path="*" element={<Login />} />  {/* wildcard route for handling 404 */}
         <Route path="/SearchedPost" element={<SearchedPost />} /> {/* contact route */}
       </Routes>
     </BrowserRouter>
