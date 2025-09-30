@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AddPost from './AddPost';
 
 function MyProfile() {
@@ -10,7 +11,16 @@ function MyProfile() {
   const [profilePic, setProfilePic] = useState(null);
   const [updating, setUpdating] = useState(false);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
+    const token = localStorage.getItem("jwt_token");
+
+    if (!token) {
+      navigate("/login");   // 👈 redirect if no token
+      return;
+    }
+    
     const fetchProfile = async () => {
       try {
         setLoading(true);

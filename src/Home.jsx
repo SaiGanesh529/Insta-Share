@@ -1,10 +1,18 @@
 import React, { useEffect, useState } from 'react';
-
+import { useNavigate } from 'react-router-dom';
 
 import Posts from './Posts';
 
 
 function Home() {
+  const navigate = useNavigate();
+
+  const token = localStorage.getItem("jwt_token");
+
+    if (!token) {
+      navigate("/login");   
+      return;
+    }
 
   const fetchStories = async () => {
     try {
