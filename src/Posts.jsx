@@ -7,11 +7,13 @@ function Posts() {
   const [posts, setPosts] = useState([]);
   const [likedPosts, setLikedPosts] = useState({});
   const [loading, setLoading] = useState(true); // loader state
+  const [newComments, setNewComments] = useState({}); // Track new comments being typed
+  const [showCommentInput, setShowCommentInput] = useState({}); // Track which posts show comment input
 
   const fetchPosts = async () => {
     try {
       setLoading(true); // start loader
-      const res = await fetch("/api/insta-share/posts", {
+      const res = await fetch("/api/posts", {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -36,8 +38,72 @@ function Posts() {
     fetchPosts();
   }, []);
 
-  const toggleLike = (postId) => {
-    setLikedPosts((prev) => ({
+  const toggleLike = async (postId) => {
+    try {
+      const res = await fetch(`/api/posts/${postId}/like`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('jwt_token')}`
+        }
+      });
+
+      if (res.ok) {
+        setLikedPosts((prev) => ({
+          ...prev,
+          [postId]: !prev[postId]
+        }));
+        // Refresh posts to get updated like count
+        fetchPosts();
+      }
+    } catch (error) {
+      console.error('Error toggling like:', error);
+    }
+  };
+
+  const handleCommentChange = (postId, comment) => {
+    setNewComments((prev) => ({
+      ...prev,
+      [postId]: comment
+    }));
+  };
+
+  const addComment = async (postId) => {
+    const comment = newComments[postId];
+    if (!comment || comment.trim() === '') return;
+
+    try {
+      const res = await fetch(`/api/posts/${postId}/comments`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('jwt_token')}`
+        },
+        body: JSON.stringify({ comment: comment.trim() })
+      });
+
+      if (res.ok) {
+        // Clear the comment input
+        setNewComments((prev) => ({
+          ...prev,
+          [postId]: ''
+        }));
+        // Refresh posts to show the new comment
+        fetchPosts();
+      }
+    } catch (error) {
+      console.error('Error adding comment:', error);
+    }
+  };
+
+  const handleKeyPress = (e, postId) => {
+    if (e.key === 'Enter') {
+      addComment(postId);
+    }
+  };
+
+  const toggleCommentInput = (postId) => {
+    setShowCommentInput((prev) => ({
       ...prev,
       [postId]: !prev[postId]
     }));
@@ -88,7 +154,13 @@ function Posts() {
                     }`}
                     size={20}
                   />
-                  <BsFillChatFill className="mr-2" />
+                  <BsFillChatFill 
+                    onClick={() => toggleCommentInput(post.post_id)}
+                    className={`cursor-pointer mr-2 ${
+                      showCommentInput[post.post_id] ? "text-blue-500" : "text-gray-600"
+                    }`}
+                    size={20}
+                  />
                   <BsFillShareFill />
                 </div>
 
@@ -118,6 +190,30 @@ function Posts() {
                   <p className="text-xs text-gray-500 uppercase mt-2">
                     {post.created_at}
                   </p>
+
+                  {/* Add Comment Section - Only show when comment icon is clicked */}
+                  {showCommentInput[post.post_id] && (
+                    <div className="mt-3 pt-3 border-t border-gray-200">
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="text"
+                          placeholder="Add a comment..."
+                          value={newComments[post.post_id] || ''}
+                          onChange={(e) => handleCommentChange(post.post_id, e.target.value)}
+                          onKeyPress={(e) => handleKeyPress(e, post.post_id)}
+                          className="flex-1 text-sm border-none outline-none bg-transparent placeholder-gray-500"
+                          autoFocus
+                        />
+                        <button
+                          onClick={() => addComment(post.post_id)}
+                          disabled={!newComments[post.post_id] || newComments[post.post_id].trim() === ''}
+                          className="text-blue-600 font-semibold text-sm hover:text-blue-800 disabled:text-gray-400 disabled:cursor-not-allowed"
+                        >
+                          Post
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

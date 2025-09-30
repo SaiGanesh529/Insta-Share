@@ -8,7 +8,7 @@ function Home() {
 
   const fetchStories = async () => {
     try {
-      const res = await fetch("/api/insta-share/stories", {
+      const res = await fetch("/api/stories", {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

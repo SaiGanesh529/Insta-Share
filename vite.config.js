@@ -8,9 +8,9 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://apis.ccbp.in/', // Adjust the target to your backend server
+        target: 'http://localhost:5000', // Backend server
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '')
+        secure: false
       }
     }
   }
